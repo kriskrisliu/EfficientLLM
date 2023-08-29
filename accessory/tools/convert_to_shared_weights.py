@@ -61,3 +61,4 @@ for ending_name in ["wq.weight","wk.weight","wv.weight","wo.weight",
         print(group_idx,loss, names)
         print("-"*40)
 torch.save(ckpt_new, dst)
+print("Save to",dst)
