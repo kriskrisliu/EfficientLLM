@@ -5,7 +5,7 @@ import bitsandbytes as bnb
 from copy import deepcopy
 
 source = "../checkpoints/llama2/Llama-2-7b/consolidated.00.pth"
-dst_dir = "./out"
+dst_dir = "/data/liuyijiang/mmlab/EfficientLLM/checkpoints/effiLLaMA2/base_weight_qkvo512_ff512"
 filename = "consolidated.00.pth"
 if not os.path.exists(dst_dir):
     os.makedirs(dst_dir)
@@ -16,7 +16,8 @@ ckpt = torch.load(source,map_location='cpu')
 ckpt_new = deepcopy(ckpt)
 
 
-for ending_name in ["wq.weight","wk.weight","wv.weight","wo.weight"]:
+for ending_name in ["wq.weight","wk.weight","wv.weight","wo.weight",   
+                    "feed_forward.w1.weight","feed_forward.w2.weight","feed_forward.w3.weight"]:
     wo_list = []
     w_name_list = []
     for key,val in ckpt.items():
@@ -26,7 +27,7 @@ for ending_name in ["wq.weight","wk.weight","wv.weight","wo.weight"]:
 
     rank = 512
     range_anchor = 2
-    print(f"(In a group) full params:{4096*4096*range_anchor}, retained params:{4096*rank*2*range_anchor+4096}, reduced:{(4096*rank*2*range_anchor+4096)/(4096*4096*range_anchor):.3f}")
+    # print(f"(In a group) full params:{4096*4096*range_anchor}, retained params:{4096*rank*2*range_anchor+4096}, reduced:{(4096*rank*2*range_anchor+4096)/(4096*4096*range_anchor):.3f}")
 
     for group_idx in range(0,len(wo_list),range_anchor):
         w_base = torch.nn.Parameter(torch.empty_like(wo_list[group_idx])).cuda()
