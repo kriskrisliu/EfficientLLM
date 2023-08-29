@@ -50,7 +50,8 @@ misc.init_distributed_mode(args)
 fs_init.initialize_model_parallel(args.model_parallel_size)
 model = MetaModel(args.llama_type, args.llama_config, args.tokenizer_path, with_visual=False)
 print(f"load pretrained from {args.pretrained_path}")
-load_tensor_parallel_model_list(model, args.pretrained_path)
+res = load_tensor_parallel_model_list(model, args.pretrained_path)
+print(res)
 
 if args.quant:
     print("Quantizing model to 4bit!")
@@ -89,6 +90,15 @@ def generate(
     text_output = results[0].strip()
     print(text_output)
     return text_output
+
+while 1:
+    try:
+        prompt = input("input=> ")
+        if prompt.strip()=="debug":
+            import ipdb;ipdb.set_trace()
+        generate(prompt, None, 512, 0.1, 0.75)
+    except Exception as e:
+        print(e)
 
 def create_demo():
     with gr.Blocks() as demo:

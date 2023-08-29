@@ -1,1 +1,1 @@
-{"lora_rank": 16, "bias_tuning": true}
+{"lora_rank": 512, "lora_rank_feedforward":64, "bias_tuning": true}

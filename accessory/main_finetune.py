@@ -41,7 +41,7 @@ from data.conversation.dataset import FinetuneDialogDataset
 
 from util.quant import quantize
 from util.tensor_parallel import load_tensor_parallel_model
-
+from tqdm import tqdm
 
 def get_args_parser():
     parser = argparse.ArgumentParser('LLaMA2-Accessory Finetuning', add_help=False)
@@ -180,6 +180,33 @@ def main(args):
                 print(f"## Load pretrained from {args.pretrained_path}", force=True)
                 load_tensor_parallel_model(model, args.pretrained_path, args.pretrained_type)
 
+                # def low_rank_equivalent(base, target):
+                #     delta = target.weight.clone().detach() - base.weight.clone().detach()
+                #     u,s,v = torch.svd(delta.to(torch.float32))
+                #     k = target.lora_a.weight.shape[0]  # rank
+                #     u_topk, s_topk, v_topk = u[:, :k], s[:k], v[:, :k]
+
+                #     lora_b = torch.mm(u_topk, torch.diag(s_topk.sqrt())).to(target.lora_b.weight.dtype)
+                #     lora_a = torch.mm(torch.diag(s_topk.sqrt()), v_topk.t()).to(target.lora_a.weight.dtype)
+
+                #     target.weight = torch.nn.Parameter(base.weight.data.clone(), requires_grad=target.weight.requires_grad)
+                #     target.lora_a.weight = torch.nn.Parameter(lora_a.data.clone(), requires_grad=target.lora_a.weight.requires_grad)
+                #     target.lora_b.weight = torch.nn.Parameter(lora_b.data.clone(), requires_grad=target.lora_b.weight.requires_grad)
+                #     # import ipdb;ipdb.set_trace()
+
+                # layer_num = len(model.llma.layers)
+
+                # for ii in tqdm([kk for kk in range(1,layer_num)]):
+                #     pass
+                #     low_rank_equivalent(model.llma.layers[0].attention.wq, model.llma.layers[ii].attention.wq)
+                #     # import ipdb;ipdb.set_trace()
+                #     low_rank_equivalent(model.llma.layers[0].attention.wk, model.llma.layers[ii].attention.wk)
+                #     low_rank_equivalent(model.llma.layers[0].attention.wv, model.llma.layers[ii].attention.wv)
+                #     low_rank_equivalent(model.llma.layers[0].attention.wo, model.llma.layers[ii].attention.wo)
+                #     # low_rank_equivalent(model.llma.layers[0].feed_forward.w1, model.llma.layers[ii].feed_forward.w1)
+                #     # low_rank_equivalent(model.llma.layers[0].feed_forward.w2, model.llma.layers[ii].feed_forward.w2)
+                #     # low_rank_equivalent(model.llma.layers[0].feed_forward.w3, model.llma.layers[ii].feed_forward.w3)
+
                 print("## Quantizing model to 4bit!", force=True)
                 quantization_config = BitsAndBytesConfig.from_dict(
                     config_dict={
@@ -200,10 +227,41 @@ def main(args):
                             args.tokenizer_path, with_visual=not args.no_visual,
                             max_seq_len=args.max_words)
         print("Finish initialization.")
-        promote_trainable_params_to_fp32(model)
-        misc.print_param_status(model)
+
         print(f"load pretrained from {args.pretrained_path}")
-        load_tensor_parallel_model(model, args.pretrained_path, args.pretrained_type)
+        res = load_tensor_parallel_model(model, args.pretrained_path, args.pretrained_type)
+        print(res)
+        promote_trainable_params_to_fp32(model)
+        # import ipdb;ipdb.set_trace()
+
+        # def low_rank_equivalent(base, target):
+        #     delta = target.weight.clone().detach() - base.weight.clone().detach()
+        #     u,s,v = torch.svd(delta.to(torch.float32))
+        #     k = target.lora_a.weight.shape[0]  # rank
+        #     u_topk, s_topk, v_topk = u[:, :k], s[:k], v[:, :k]
+
+        #     lora_b = torch.mm(u_topk, torch.diag(s_topk.sqrt())).to(target.lora_b.weight.dtype)
+        #     lora_a = torch.mm(torch.diag(s_topk.sqrt()), v_topk.t()).to(target.lora_a.weight.dtype)
+
+        #     target.weight = torch.nn.Parameter(base.weight.data.clone(), requires_grad=target.weight.requires_grad)
+        #     target.lora_a.weight = torch.nn.Parameter(lora_a.data.clone(), requires_grad=target.lora_a.weight.requires_grad)
+        #     target.lora_b.weight = torch.nn.Parameter(lora_b.data.clone(), requires_grad=target.lora_b.weight.requires_grad)
+        #     # import ipdb;ipdb.set_trace()
+
+        # layer_num = len(model.llma.layers)
+        # model.cuda()
+
+        # for ii in tqdm([kk for kk in range(1,layer_num)]):
+        #     pass
+        #     low_rank_equivalent(model.llma.layers[0].attention.wq, model.llma.layers[ii].attention.wq)
+        #     # import ipdb;ipdb.set_trace()
+        #     low_rank_equivalent(model.llma.layers[0].attention.wk, model.llma.layers[ii].attention.wk)
+        #     low_rank_equivalent(model.llma.layers[0].attention.wv, model.llma.layers[ii].attention.wv)
+        #     low_rank_equivalent(model.llma.layers[0].attention.wo, model.llma.layers[ii].attention.wo)
+        #     low_rank_equivalent(model.llma.layers[0].feed_forward.w1, model.llma.layers[ii].feed_forward.w1)
+        #     low_rank_equivalent(model.llma.layers[0].feed_forward.w2, model.llma.layers[ii].feed_forward.w2)
+        #     low_rank_equivalent(model.llma.layers[0].feed_forward.w3, model.llma.layers[ii].feed_forward.w3)
+
     print("Unwrapped Model = %s" % str(model))
 
     # resume stage1

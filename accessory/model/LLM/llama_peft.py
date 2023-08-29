@@ -48,6 +48,7 @@ class ModelArgs:
     rope_scaling: Optional[float] = None
 
     lora_rank: int = -1 # lora
+    lora_rank_feedforward: int = -1 # lora
 
     bias_tuning: bool = True  # bias
 
@@ -207,15 +208,15 @@ class FeedForward(nn.Module):
 
         self.w1 = LoraColumnParallelLinear(
             dim, hidden_dim, bias=args.bias_tuning, gather_output=False,
-            init_method=default_linear_init, lora_rank=args.lora_rank
+            init_method=default_linear_init, lora_rank=args.lora_rank_feedforward
         )
         self.w2 = LoraRowParallelLinear(
             hidden_dim, dim, bias=args.bias_tuning, input_is_parallel=True,
-            init_method=default_linear_init, lora_rank=args.lora_rank
+            init_method=default_linear_init, lora_rank=args.lora_rank_feedforward
         )
         self.w3 = LoraColumnParallelLinear(
             dim, hidden_dim, bias=args.bias_tuning, gather_output=False,
-            init_method=default_linear_init, lora_rank=args.lora_rank
+            init_method=default_linear_init, lora_rank=args.lora_rank_feedforward
         )
 
     # @torch.compile
