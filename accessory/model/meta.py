@@ -35,6 +35,7 @@ class MetaModel(nn.Module):
         model_args.vocab_size = self.tokenizer.n_words
 
         print("Model Args:\n", model_args)
+        self.model_args = model_args
 
         model = Transformer(model_args, with_visual=with_visual)
         self.llma = model

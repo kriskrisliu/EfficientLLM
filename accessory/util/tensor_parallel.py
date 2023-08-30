@@ -260,7 +260,7 @@ def load_tensor_parallel_model_state_dict(
 
 
 def load_tensor_parallel_model(
-    model: nn.Module, path: str, format: str, verbose: bool = False
+    model: nn.Module, path: str, format: str, verbose: bool = False, recon:bool=False
 ) -> Tuple[List[str], List[str]]:
     r""""This method calls ``load_tensor_parallel_model_state_dict`` (which
     handles multiple formats / unmatched tensor parallel size) and load the
@@ -288,6 +288,10 @@ def load_tensor_parallel_model(
     local_state_dict = load_tensor_parallel_model_state_dict(
         model, path, format, verbose
     )
+    if recon:
+        from util.reconstruct import reconstruct
+        reconstruct(local_state_dict, model.model_args)
+
     return model.load_state_dict(local_state_dict, strict=False)
 
 

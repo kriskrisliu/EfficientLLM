@@ -5,7 +5,7 @@ import bitsandbytes as bnb
 from copy import deepcopy
 
 source = "../checkpoints/llama2/Llama-2-7b/consolidated.00.pth"
-dst_dir = "/data/liuyijiang/mmlab/EfficientLLM/checkpoints/effiLLaMA2/base_weight_qkvo512_ff512"
+dst_dir = "/data/liuyijiang/mmlab/EfficientLLM/checkpoints/effiLLaMA2/base_weight_qkvoE4R512_ffE4R512"
 filename = "consolidated.00.pth"
 if not os.path.exists(dst_dir):
     os.makedirs(dst_dir)
@@ -26,7 +26,7 @@ for ending_name in ["wq.weight","wk.weight","wv.weight","wo.weight",
             w_name_list += [key]
 
     rank = 512
-    range_anchor = 2
+    range_anchor = 4
     # print(f"(In a group) full params:{4096*4096*range_anchor}, retained params:{4096*rank*2*range_anchor+4096}, reduced:{(4096*rank*2*range_anchor+4096)/(4096*4096*range_anchor):.3f}")
 
     for group_idx in range(0,len(wo_list),range_anchor):

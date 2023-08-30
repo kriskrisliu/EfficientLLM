@@ -49,6 +49,7 @@ class ModelArgs:
 
     lora_rank: int = -1 # lora
     lora_rank_feedforward: int = -1 # lora
+    range_anchor: int = -1
 
     bias_tuning: bool = True  # bias
 
