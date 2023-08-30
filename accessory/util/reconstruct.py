@@ -54,3 +54,7 @@ def reconstruct(local_state_dict, model_args):
                 print("layer_id={}, loss={:.2e},".format(group_idx,loss.item()), names)
                 print("-"*40)
             # import ipdb;ipdb.set_trace()
+    else:
+        pass
+    torch.distributed.barrier()
+    return local_state_dict

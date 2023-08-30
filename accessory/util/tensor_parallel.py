@@ -290,7 +290,7 @@ def load_tensor_parallel_model(
     )
     if recon:
         from util.reconstruct import reconstruct
-        reconstruct(local_state_dict, model.model_args)
+        local_state_dict = reconstruct(local_state_dict, model.model_args)
 
     return model.load_state_dict(local_state_dict, strict=False)
 
