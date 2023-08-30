@@ -108,7 +108,7 @@ class FinetuneDataset(Dataset):
             filename = data_item['image']
             question = data_item['conversations'][0]['value']
             answer = data_item['conversations'][1]['value']
-
+            filename = os.path.join("/data/liuyijiang/mmlab/EfficientLLM/data/coco2017/train2017/",filename)
             image = Image.open(filename).convert('RGB')
             image = self.transform(image)
             format_instruction = question

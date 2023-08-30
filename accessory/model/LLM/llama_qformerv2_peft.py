@@ -47,6 +47,8 @@ class ModelArgs:
     rope_scaling: Optional[float] = None
 
     lora_rank: int = -1 # lora
+    lora_rank_feedforward:int = -1
+    range_anchor:int = -1
 
     bias_tuning: bool = True  # bias
 
@@ -286,7 +288,12 @@ class Transformer(nn.Module):
         self.cache_image_words = 0 # for inference
         if with_visual:
             print("build llama model with qformerv2")
-            self.qformer = Blip2Model.from_pretrained("Salesforce/blip2-opt-2.7b", torch_dtype=torch.float16)
+            while 1:
+                try:
+                    self.qformer = Blip2Model.from_pretrained("Salesforce/blip2-opt-2.7b", torch_dtype=torch.float16)
+                    break
+                except Exception as e:
+                    print(e)
 
             self.qformer.language_projection = None
             self.qformer.language_model = None
