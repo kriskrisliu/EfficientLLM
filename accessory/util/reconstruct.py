@@ -48,9 +48,9 @@ def reconstruct(local_state_dict, model_args):
                     pbar.set_description(f'Training - Epoch {epoch+1}, Loss: {loss.item():.2e}, w:{w_base[0,0].item():.2e} grad:{w_base.grad[0,0].item():.2e}')
                     optimizer.step()
                 for layer_idx, name in enumerate(names):
-                    local_state_dict[name] = w_base.to(local_state_dict[name].dtype)
-                    local_state_dict[name.replace("weight","lora_a.weight")] = w_lora_list[layer_idx][1]
-                    local_state_dict[name.replace("weight","lora_b.weight")] = w_lora_list[layer_idx][0]
-                print(group_idx,loss, names)
+                    local_state_dict[name] = w_base.detach().to("cpu",local_state_dict[name].dtype)
+                    local_state_dict[name.replace("weight","lora_a.weight")] = w_lora_list[layer_idx][1].detach().to("cpu")
+                    local_state_dict[name.replace("weight","lora_b.weight")] = w_lora_list[layer_idx][0].detach().to("cpu")
+                print("layer_id={}, loss={:.2e},".format(group_idx,loss.item()), names)
                 print("-"*40)
             # import ipdb;ipdb.set_trace()
