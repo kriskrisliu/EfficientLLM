@@ -9,7 +9,7 @@ data_config=configs/data/finetune/sg/alpaca.yaml
 data_parallel=sdp
 model_parallel=1
 
-exp_name=finetune/sg/alpaca_llamaPeft_normBiasLora_qkvE3R512_ffE3R512_recon_7B
+exp_name=finetune/sg/alpaca_llamaPeft_normBiasLora_qkvE4R512_ffE4R512_preconvert_7B
 # exp_name=dummy
 echo "exp name: $exp_name"
 mkdir -p output/"$exp_name"
@@ -25,8 +25,9 @@ torchrun --master_port=$4 --nproc_per_node=8 main_finetune.py \
 --no_visual \
 --pretrained_path "$pretrained_path" --pretrained_type="$pretrained_type" \
 --data_config $data_config \
---recon \
 2>&1 | tee -a output/"$exp_name"/output.log
+
+# --recon \
 
 echo "exp name: $exp_name"
 
