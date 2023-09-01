@@ -390,8 +390,8 @@ def save_checkpoint(output_dir, args, model, optimizer, loss_scaler, dataset_sta
                 torch.save(consolidated_optim_state_dict , save_path)
 
             torch.distributed.GroupMember.WORLD = _world
-        _save_optimizer()
-        print("optimizer saved")
+        # _save_optimizer()
+        # print("optimizer saved")
 
         def _save_other():
             consolidated_other_state_dict = {
@@ -406,8 +406,8 @@ def save_checkpoint(output_dir, args, model, optimizer, loss_scaler, dataset_sta
             )
             if fs_init.get_data_parallel_rank() == 0:
                 torch.save(consolidated_other_state_dict, save_path)
-        _save_other()
-        print("other rank-common saved")
+        # _save_other()
+        # print("other rank-common saved")
 
 
     def _save_rank_specific():
@@ -420,8 +420,8 @@ def save_checkpoint(output_dir, args, model, optimizer, loss_scaler, dataset_sta
             )
         torch.save(rank_specific_state_dict, save_path)
 
-    _save_rank_specific()
-    print("rank-specific saved")
+    # _save_rank_specific()
+    # print("rank-specific saved")
 
 
 def resume_stage1(args, model_without_FSDP):

@@ -18,7 +18,7 @@ torchrun --nproc-per-node=1 --master-port 29400 convert_to_shared_weights.py \
 --dst_dir=../checkpoints/effiLLaMA2/13b/base_weight_qkvoE4R512_ffE4R512/ \
 --range_anchor=4 \
 --rank=512 \
---filename=consolidated.00.pth \
+--filename=consolidated.00-of-01.model.pth \
 --DEBUG=False \
 --llama_config=../checkpoints/llama2/Llama-2-13b/params.json \
 --format=meta_ori
@@ -28,7 +28,7 @@ def main(
         dst_dir,
         range_anchor,
         rank,
-        filename = "consolidated.00.pth",
+        filename = "consolidated.00-of-01.model.pth",
         DEBUG = False,
         llama_config="",
         format="meta_ori"
@@ -56,6 +56,14 @@ def main(
         fs_init.initialize_model_parallel(1)
         model = MetaModel("llama", [os.path.abspath(llama_config)], 
                           os.path.abspath("../checkpoints/llama2/Llama-2-7b/tokenizer.model"), with_visual=False)
+        for name,module in model.named_modules():
+            if name.endswith("wq"):
+                print("wq:",module.weight.shape)
+                break
+        for name,module in model.named_modules():
+            if name.endswith("w1"):
+                print("w1:",module.weight.shape)
+                break
         ckpt = load_tensor_parallel_model_state_dict(model, source, format, False)
         # import ipdb;ipdb.set_trace()
     ckpt_new = ckpt
