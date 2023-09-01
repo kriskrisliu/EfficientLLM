@@ -13,15 +13,17 @@ import util.misc as misc
 from util.tensor_parallel import load_tensor_parallel_model_state_dict
 
 """
-torchrun --nproc-per-node=1 --master-port 29400 convert_to_shared_weights.py \
---source=../checkpoints/llama2/Llama-2-13b/ \
---dst_dir=../checkpoints/effiLLaMA2/13b/base_weight_qkvoE4R512_ffE4R512/ \
---range_anchor=4 \
---rank=512 \
+PORT=$(shuf -i 29000-29400 -n 1)
+torchrun --nproc-per-node=1 --master-port $PORT convert_to_shared_weights.py \
+--source=../checkpoints/caption_llamaQformerv2_13b \
+--dst_dir=../checkpoints/effiLLaMA2/mm/base_weight_qkvoE3R640_ffE3R640/ \
+--range_anchor=3 \
+--rank=640 \
 --filename=consolidated.00-of-01.model.pth \
---DEBUG=False \
 --llama_config=../checkpoints/llama2/Llama-2-13b/params.json \
---format=meta_ori
+--format=consolidated \
+--llama_type="llama_qformerv2" \
+--DEBUG=True
 """
 def main(
         source,
@@ -31,7 +33,8 @@ def main(
         filename = "consolidated.00-of-01.model.pth",
         DEBUG = False,
         llama_config="",
-        format="meta_ori"
+        format="meta_ori", # consolidated
+        llama_type="llama", # llama_qformerv2
         ):
 
     assert f"E{range_anchor}R{rank}" in dst_dir
@@ -54,7 +57,7 @@ def main(
 
         misc.init_distributed_mode(args)
         fs_init.initialize_model_parallel(1)
-        model = MetaModel("llama", [os.path.abspath(llama_config)], 
+        model = MetaModel(llama_type, [os.path.abspath(llama_config)], 
                           os.path.abspath("../checkpoints/llama2/Llama-2-7b/tokenizer.model"), with_visual=False)
         for name,module in model.named_modules():
             if name.endswith("wq"):
